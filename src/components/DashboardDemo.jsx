@@ -4,8 +4,9 @@ import {
   AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { Activity, Shield, Droplets, Wifi, MapPin, Bell, Clock, Thermometer } from 'lucide-react';
+import { Activity, Shield, Droplets, Wifi, MapPin, Bell, Clock, Thermometer, BrainCircuit, Radio } from 'lucide-react';
 import { sensorData, waterLevelData, rainfallData, activeAlerts } from '../data/dummyData';
+import AdminAiControl from './AdminAiControl';
 
 const dotColor = { tinggi: '#ef4444', sedang: '#f59e0b', rendah: '#22c55e' };
 
@@ -321,6 +322,7 @@ export default function DashboardDemo() {
   const inView = useInView(ref, { once:true, margin:'-60px' });
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState('ketinggian');
+  const [dashboardView, setDashboardView] = useState('telemetri'); // 'telemetri' | 'ai-matching'
 
   return (
     <section id="dashboard" ref={ref} style={{ padding:'96px 0', position:'relative' }}>
@@ -330,13 +332,13 @@ export default function DashboardDemo() {
       <div style={{ position:'relative', maxWidth:1280, margin:'0 auto', padding:'0 20px' }}>
 
         {/* Header */}
-        <motion.div initial={{ opacity:0, y:20 }} animate={inView?{opacity:1,y:0}:{}} style={{ textAlign:'center', marginBottom:44 }}>
-          <div className="section-label">Dashboard Operasional</div>
+        <motion.div initial={{ opacity:0, y:20 }} animate={inView?{opacity:1,y:0}:{}} style={{ textAlign:'center', marginBottom:36 }}>
+          <div className="section-label">Dashboard Operasional & Komando</div>
           <h2 style={{ fontSize:'clamp(24px, 4vw, 42px)', fontWeight:800, marginBottom:10, letterSpacing:'-0.02em' }}>
             Pusat Kendali <span className="grad-text">HYDROGUARD</span>
           </h2>
-          <p style={{ fontSize:15, color:'var(--text-secondary)', maxWidth:460, margin:'0 auto', lineHeight:1.7 }}>
-            Simulasi tampilan dashboard operasional real-time untuk operator pemantauan banjir Jabodetabek.
+          <p style={{ fontSize:15, color:'var(--text-secondary)', maxWidth:560, margin:'0 auto', lineHeight:1.7 }}>
+            Platform pemantauan telemetri real-time, pencocokan pola banjir berbasis AI, dan sistem broadcast peringatan dini terpersonalisasi untuk otoritas BPBD/Pemerintah.
           </p>
         </motion.div>
 
@@ -350,13 +352,13 @@ export default function DashboardDemo() {
               <div style={{ display:'flex', gap:5 }}>
                 {['#ef4444','#f59e0b','#22c55e'].map(c => <div key={c} style={{ width:10, height:10, borderRadius:'50%', background:c, opacity:0.75 }} />)}
               </div>
-              <span style={{ fontSize:11.5, color:'var(--text-muted)', fontFamily:'JetBrains Mono,monospace' }}>HYDROGUARD — Pusat Kendali Banjir Jabodetabek</span>
+              <span style={{ fontSize:11.5, color:'var(--text-muted)', fontFamily:'JetBrains Mono,monospace' }}>HYDROGUARD — Pusat Kendali Banjir Jabodetabek (Level Administrator)</span>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
               <span style={{ fontSize:11, color:'var(--text-faint)', fontFamily:'JetBrains Mono,monospace' }}>21:25 WIB · 27 Sep 2025</span>
               <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:11.5, fontWeight:600, color:'#34d399' }}>
                 <span className="blink" style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e', display:'inline-block' }} />
-                LIVE
+                LIVE COMMAND
               </div>
             </div>
           </div>
@@ -364,52 +366,118 @@ export default function DashboardDemo() {
           {/* Body */}
           <div style={{ padding:18, display:'flex', flexDirection:'column', gap:16 }}>
 
-            {/* Summary cards */}
-            <SummaryCards />
+            {/* Operator Sub Navigation Switcher */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10, paddingBottom:12, borderBottom:'1px solid var(--border-subtle)' }}>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setDashboardView('telemetri')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '8px 14px',
+                    borderRadius: 8,
+                    fontSize: 12.5,
+                    fontWeight: dashboardView === 'telemetri' ? 700 : 500,
+                    background: dashboardView === 'telemetri' ? 'var(--accent)' : 'var(--bg-input)',
+                    color: dashboardView === 'telemetri' ? '#ffffff' : 'var(--text-secondary)',
+                    border: `1px solid ${dashboardView === 'telemetri' ? 'var(--accent)' : 'var(--border)'}`,
+                    cursor: 'pointer',
+                    transition: 'all 0.18s',
+                  }}
+                >
+                  <Activity size={14} />
+                  Telemetri Sensor & Peta Ciliwung
+                </button>
 
-            {/* Map + Alerts side by side on desktop */}
-            <div className="dash-map-grid" style={{ display:'grid', gridTemplateColumns:'1fr', gap:14 }}>
-              <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-                <SensorMap selected={selected} setSelected={setSelected} />
-                <SensorDetail sensor={selected} />
-              </div>
-              <AlertList />
-            </div>
-
-            {/* Chart panel */}
-            <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:14, padding:16, backdropFilter:'blur(12px)', transition:'background 0.35s' }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14, flexWrap:'wrap', gap:10 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                  <Activity size={14} color="var(--accent)" />
-                  <span style={{ fontSize:13, fontWeight:700, color:'var(--text-heading)' }}>
-                    {tab==='ketinggian' ? 'Ketinggian Air 24 Jam (meter)' : 'Curah Hujan vs Prediksi AI (mm/jam)'}
+                <button
+                  type="button"
+                  onClick={() => setDashboardView('ai-matching')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '8px 14px',
+                    borderRadius: 8,
+                    fontSize: 12.5,
+                    fontWeight: dashboardView === 'ai-matching' ? 700 : 500,
+                    background: dashboardView === 'ai-matching' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'var(--bg-input)',
+                    color: dashboardView === 'ai-matching' ? '#ffffff' : 'var(--text-secondary)',
+                    border: `1px solid ${dashboardView === 'ai-matching' ? '#ef4444' : 'var(--border)'}`,
+                    cursor: 'pointer',
+                    transition: 'all 0.18s',
+                  }}
+                >
+                  <BrainCircuit size={14} />
+                  Analisis AI & Dispatcher Peringatan Dini
+                  <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.22)', padding: '1px 6px', borderRadius: 999, fontWeight: 800 }}>
+                    MATCH 94.8%
                   </span>
-                </div>
-                <div style={{ display:'flex', gap:6 }}>
-                  {[{k:'ketinggian',l:'Ketinggian'},{k:'curah',l:'Curah Hujan'}].map(t => (
-                    <button key={t.k} onClick={() => setTab(t.k)}
-                      style={{ padding:'5px 12px', borderRadius:7, fontSize:12, fontWeight:500, border:'1px solid', cursor:'pointer', transition:'all 0.18s', background:tab===t.k?'var(--accent-dim)':'transparent', color:tab===t.k?'var(--accent)':'var(--text-muted)', borderColor:tab===t.k?'var(--border-hover)':'transparent' }}>
-                      {t.l}
-                    </button>
-                  ))}
-                </div>
+                </button>
               </div>
-              <AnimatePresence mode="wait">
-                <motion.div key={tab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={{ duration:0.2 }}>
-                  {tab==='ketinggian' ? <WaterLevelChart /> : <RainfallChart />}
-                </motion.div>
-              </AnimatePresence>
+
+              <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, color:'var(--text-muted)' }}>
+                <span>Mode Akses:</span>
+                <span style={{ fontWeight:700, color:'var(--text-heading)', background:'var(--bg-card)', border:'1px solid var(--border)', padding:'3px 8px', borderRadius:6 }}>
+                  🛡️ Operator BPBD / Pemerintah
+                </span>
+              </div>
             </div>
 
-            {/* Sensor table */}
-            <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:14, padding:16, backdropFilter:'blur(12px)', transition:'background 0.35s' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:14 }}>
-                <Wifi size={14} color="var(--accent)" />
-                <span style={{ fontSize:13, fontWeight:700, color:'var(--text-heading)' }}>Status Semua Sensor</span>
-                <span style={{ fontSize:11, color:'var(--text-muted)' }}>{sensorData.length} titik pantau aktif</span>
-              </div>
-              <SensorTable selected={selected} setSelected={setSelected} />
-            </div>
+            {dashboardView === 'telemetri' ? (
+              <>
+                {/* Summary cards */}
+                <SummaryCards />
+
+                {/* Map + Alerts side by side on desktop */}
+                <div className="dash-map-grid" style={{ display:'grid', gridTemplateColumns:'1fr', gap:14 }}>
+                  <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+                    <SensorMap selected={selected} setSelected={setSelected} />
+                    <SensorDetail sensor={selected} />
+                  </div>
+                  <AlertList />
+                </div>
+
+                {/* Chart panel */}
+                <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:14, padding:16, backdropFilter:'blur(12px)', transition:'background 0.35s' }}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14, flexWrap:'wrap', gap:10 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                      <Activity size={14} color="var(--accent)" />
+                      <span style={{ fontSize:13, fontWeight:700, color:'var(--text-heading)' }}>
+                        {tab==='ketinggian' ? 'Ketinggian Air 24 Jam (meter)' : 'Curah Hujan vs Prediksi AI (mm/jam)'}
+                      </span>
+                    </div>
+                    <div style={{ display:'flex', gap:6 }}>
+                      {[{k:'ketinggian',l:'Ketinggian'},{k:'curah',l:'Curah Hujan'}].map(t => (
+                        <button key={t.k} onClick={() => setTab(t.k)}
+                          style={{ padding:'5px 12px', borderRadius:7, fontSize:12, fontWeight:500, border:'1px solid', cursor:'pointer', transition:'all 0.18s', background:tab===t.k?'var(--accent-dim)':'transparent', color:tab===t.k?'var(--accent)':'var(--text-muted)', borderColor:tab===t.k?'var(--border-hover)':'transparent' }}>
+                          {t.l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <AnimatePresence mode="wait">
+                    <motion.div key={tab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={{ duration:0.2 }}>
+                      {tab==='ketinggian' ? <WaterLevelChart /> : <RainfallChart />}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Sensor table */}
+                <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:14, padding:16, backdropFilter:'blur(12px)', transition:'background 0.35s' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:14 }}>
+                    <Wifi size={14} color="var(--accent)" />
+                    <span style={{ fontSize:13, fontWeight:700, color:'var(--text-heading)' }}>Status Semua Sensor</span>
+                    <span style={{ fontSize:11, color:'var(--text-muted)' }}>{sensorData.length} titik pantau aktif</span>
+                  </div>
+                  <SensorTable selected={selected} setSelected={setSelected} />
+                </div>
+              </>
+            ) : (
+              <AdminAiControl />
+            )}
+
           </div>
         </motion.div>
       </div>
