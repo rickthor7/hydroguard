@@ -6,7 +6,8 @@ import { useTheme } from '../context/ThemeContext';
 const navItems = [
   { label: 'Beranda', href: '#beranda' },
   { label: 'Cara Kerja', href: '#cara-kerja' },
-  { label: 'Dashboard', href: '#dashboard' },
+  { label: 'Pusat Kendali', href: '#dashboard' },
+  { label: 'Portal Warga', href: '#portal-warga' },
   { label: 'Dampak', href: '#dampak' },
 ];
 

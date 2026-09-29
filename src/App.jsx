@@ -5,6 +5,7 @@ import HeroSection from './components/HeroSection';
 import ProblemStatement from './components/ProblemStatement';
 import CaraKerja from './components/CaraKerja';
 import DashboardDemo from './components/DashboardDemo';
+import PortalMasyarakat from './components/PortalMasyarakat';
 import FiturUnggulan from './components/FiturUnggulan';
 import DampakKontribusi from './components/DampakKontribusi';
 import Footer from './components/Footer';
@@ -21,6 +22,8 @@ function AppContent() {
         <CaraKerja />
         <div className="divider" style={{ margin: '0 32px' }} />
         <DashboardDemo />
+        <div className="divider" style={{ margin: '0 32px' }} />
+        <PortalMasyarakat />
         <div className="divider" style={{ margin: '0 32px' }} />
         <FiturUnggulan />
         <div className="divider" style={{ margin: '0 32px' }} />
