@@ -4,8 +4,12 @@ import {
   AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { Activity, Shield, Droplets, Wifi, MapPin, Bell, Clock, Thermometer, BrainCircuit, Radio } from 'lucide-react';
+import {
+  Activity, Shield, Droplets, Wifi, MapPin, Bell, Clock, Thermometer,
+  BrainCircuit, Radio, CloudLightning, CloudRain, Wind, AlertTriangle
+} from 'lucide-react';
 import { sensorData, waterLevelData, rainfallData, activeAlerts } from '../data/dummyData';
+import { cuacaWarga } from '../data/masyarakatData';
 import AdminAiControl from './AdminAiControl';
 
 const dotColor = { tinggi: '#ef4444', sedang: '#f59e0b', rendah: '#22c55e' };
@@ -237,6 +241,56 @@ function RainfallChart() {
   );
 }
 
+/* ── Government Weather & BMKG Radar Monitor ── */
+function GovernmentWeatherMonitor() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: 14 }} className="dash-map-grid">
+      <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: 10, padding: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CloudLightning size={16} color="#0ea5e9" />
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-heading)' }}>
+              Stasiun Meteorologi BMKG — {cuacaWarga.kota}
+            </span>
+          </div>
+          <span style={{ fontSize: 10.5, padding: '2px 8px', borderRadius: 999, background: 'rgba(239,68,68,0.18)', color: '#ef4444', fontWeight: 700 }}>
+            SIAGA HUJAN LEBAT
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '10px 0' }}>
+          <div style={{ fontSize: 36, fontWeight: 900, color: 'var(--text-heading)', fontFamily: 'Space Grotesk, sans-serif' }}>
+            {cuacaWarga.suhu}°C
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>{cuacaWarga.kondisi}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Kelembapan: {cuacaWarga.kelembapan}% • Angin: {cuacaWarga.angin}</div>
+          </div>
+        </div>
+
+        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 8, padding: '8px 10px', fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <strong style={{ color: '#ef4444' }}>Notice BMKG:</strong> {cuacaWarga.peringatanBMKG}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+          Prakiraan Presipitasi 6 Jam DAS Ciliwung
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+          {cuacaWarga.prakiraanJam.slice(0, 6).map(jam => (
+            <div key={jam.jam} style={{ background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: 8, padding: '8px 10px', textAlign: 'center' }}>
+              <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{jam.jam}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: jam.mm > 25 ? '#ef4444' : '#0ea5e9', marginTop: 2 }}>{jam.mm} mm</div>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{jam.cuaca}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Sensor Table ── */
 function SensorTable({ selected, setSelected }) {
   return (
@@ -442,11 +496,15 @@ export default function DashboardDemo() {
                     <div style={{ display:'flex', alignItems:'center', gap:7 }}>
                       <Activity size={14} color="var(--accent)" />
                       <span style={{ fontSize:13, fontWeight:700, color:'var(--text-heading)' }}>
-                        {tab==='ketinggian' ? 'Ketinggian Air 24 Jam (meter)' : 'Curah Hujan vs Prediksi AI (mm/jam)'}
+                        {tab==='ketinggian' ? 'Ketinggian Air 24 Jam (meter)' : tab==='curah' ? 'Curah Hujan vs Prediksi AI (mm/jam)' : 'Radar Cuaca & Presipitasi BMKG Real-Time'}
                       </span>
                     </div>
-                    <div style={{ display:'flex', gap:6 }}>
-                      {[{k:'ketinggian',l:'Ketinggian'},{k:'curah',l:'Curah Hujan'}].map(t => (
+                    <div style={{ display:'flex', gap:6, flexWrap: 'wrap' }}>
+                      {[
+                        { k:'ketinggian', l:'Ketinggian Air' },
+                        { k:'curah', l:'Curah Hujan AI' },
+                        { k:'cuaca', l:'Radar Cuaca BMKG' },
+                      ].map(t => (
                         <button key={t.k} onClick={() => setTab(t.k)}
                           style={{ padding:'5px 12px', borderRadius:7, fontSize:12, fontWeight:500, border:'1px solid', cursor:'pointer', transition:'all 0.18s', background:tab===t.k?'var(--accent-dim)':'transparent', color:tab===t.k?'var(--accent)':'var(--text-muted)', borderColor:tab===t.k?'var(--border-hover)':'transparent' }}>
                           {t.l}
@@ -456,7 +514,7 @@ export default function DashboardDemo() {
                   </div>
                   <AnimatePresence mode="wait">
                     <motion.div key={tab} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} transition={{ duration:0.2 }}>
-                      {tab==='ketinggian' ? <WaterLevelChart /> : <RainfallChart />}
+                      {tab==='ketinggian' ? <WaterLevelChart /> : tab==='curah' ? <RainfallChart /> : <GovernmentWeatherMonitor />}
                     </motion.div>
                   </AnimatePresence>
                 </div>
