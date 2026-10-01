@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ChevronDown, Zap, Shield, Activity } from 'lucide-react';
+import { useRole } from '../context/RoleContext';
 
 const pills = [
   { icon: Activity, text: '10 Sensor Aktif', color: 'var(--accent)' },
@@ -8,6 +9,7 @@ const pills = [
 ];
 
 export default function HeroSection() {
+  const { setActiveRole } = useRole();
   return (
     <section id="beranda" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 80, paddingBottom: 40, position: 'relative', overflow: 'hidden' }}>
 
@@ -81,16 +83,64 @@ export default function HeroSection() {
           <strong style={{ color: 'var(--accent2)', fontWeight: 700 }}>6 jam lebih awal</strong>.
         </motion.p>
 
-        {/* CTAs */}
+        {/* CTAs with separated Government and Citizen Dashboard access */}
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.3 }}
           style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 44 }}>
-          <a href="#dashboard" className="btn-primary">
-            Lihat Demo Dashboard
+          <button
+            type="button"
+            onClick={() => {
+              setActiveRole('warga');
+              const el = document.getElementById('portal-warga');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#ffffff',
+              padding: '12px 22px',
+              borderRadius: 10,
+              fontSize: 14,
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 0 24px rgba(16,185,129,0.35)',
+              transition: 'transform 0.2s',
+            }}
+          >
+            <span>👥</span>
+            <span>Masuk Portal Warga & Evakuasi</span>
             <ChevronDown size={15} />
-          </a>
-          <a href="#cara-kerja" className="btn-outline">
-            Cara Kerja Sistem
-          </a>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveRole('pemerintah');
+              const el = document.getElementById('dashboard');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+              color: '#ffffff',
+              padding: '12px 22px',
+              borderRadius: 10,
+              fontSize: 14,
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 0 24px rgba(14,165,233,0.35)',
+              transition: 'transform 0.2s',
+            }}
+          >
+            <span>🏛️</span>
+            <span>Masuk Pusat Kendali BPBD</span>
+            <ChevronDown size={15} />
+          </button>
         </motion.div>
 
         {/* Stat pills */}

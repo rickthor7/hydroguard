@@ -1,5 +1,6 @@
 import './index.css';
 import { ThemeProvider } from './context/ThemeContext';
+import { RoleProvider, useRole } from './context/RoleContext';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import ProblemStatement from './components/ProblemStatement';
@@ -11,19 +12,33 @@ import DampakKontribusi from './components/DampakKontribusi';
 import Footer from './components/Footer';
 
 function AppContent() {
+  const { activeRole } = useRole();
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', transition: 'background 0.35s, color 0.35s' }}>
       <Navbar />
       <main>
         <HeroSection />
+
         <div className="divider" style={{ margin: '0 32px' }} />
-        <ProblemStatement />
-        <div className="divider" style={{ margin: '0 32px' }} />
-        <CaraKerja />
-        <div className="divider" style={{ margin: '0 32px' }} />
-        <DashboardDemo />
-        <div className="divider" style={{ margin: '0 32px' }} />
-        <PortalMasyarakat />
+
+        {/* Separated Dashboards based on Active Role (Tanpa Login) */}
+        {activeRole === 'pemerintah' ? (
+          <>
+            <ProblemStatement />
+            <div className="divider" style={{ margin: '0 32px' }} />
+            <CaraKerja />
+            <div className="divider" style={{ margin: '0 32px' }} />
+            <DashboardDemo />
+          </>
+        ) : (
+          <>
+            <PortalMasyarakat />
+            <div className="divider" style={{ margin: '0 32px' }} />
+            <CaraKerja />
+          </>
+        )}
+
         <div className="divider" style={{ margin: '0 32px' }} />
         <FiturUnggulan />
         <div className="divider" style={{ margin: '0 32px' }} />
@@ -37,7 +52,9 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <RoleProvider>
+        <AppContent />
+      </RoleProvider>
     </ThemeProvider>
   );
 }

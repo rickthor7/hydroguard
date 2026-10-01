@@ -1,20 +1,28 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Droplets, Menu, X, Sun, Moon } from 'lucide-react';
+import { Droplets, Menu, X, Sun, Moon, Shield, Users } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-
-const navItems = [
-  { label: 'Beranda', href: '#beranda' },
-  { label: 'Cara Kerja', href: '#cara-kerja' },
-  { label: 'Pusat Kendali', href: '#dashboard' },
-  { label: 'Portal Warga', href: '#portal-warga' },
-  { label: 'Dampak', href: '#dampak' },
-];
+import { useRole } from '../context/RoleContext';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { isDark, toggle } = useTheme();
+  const { activeRole, setActiveRole } = useRole();
+
+  const navItems = activeRole === 'pemerintah'
+    ? [
+        { label: 'Beranda', href: '#beranda' },
+        { label: 'Pusat Kendali BPBD', href: '#dashboard' },
+        { label: 'Cara Kerja', href: '#cara-kerja' },
+        { label: 'Dampak', href: '#dampak' },
+      ]
+    : [
+        { label: 'Beranda', href: '#beranda' },
+        { label: 'Portal Siaga Warga', href: '#portal-warga' },
+        { label: 'Cara Kerja', href: '#cara-kerja' },
+        { label: 'Dampak', href: '#dampak' },
+      ];
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
@@ -33,7 +41,7 @@ export default function Navbar() {
         transition: 'background 0.3s, border-color 0.3s',
       }}
     >
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
 
         {/* Logo */}
         <a href="#beranda" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
@@ -46,15 +54,77 @@ export default function Navbar() {
           </span>
         </a>
 
-        {/* Desktop nav */}
+        {/* Prominent Instant Role Switcher (Tanpa Login) */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: 999,
+            padding: 3,
+            gap: 2,
+            boxShadow: 'var(--card-shadow)',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveRole('pemerintah')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '5px 12px',
+              borderRadius: 999,
+              fontSize: 11.5,
+              fontWeight: activeRole === 'pemerintah' ? 800 : 500,
+              background: activeRole === 'pemerintah' ? 'var(--accent)' : 'transparent',
+              color: activeRole === 'pemerintah' ? '#ffffff' : 'var(--text-secondary)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            <span>🏛️</span>
+            <span>Pemerintah / BPBD</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveRole('warga')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '5px 12px',
+              borderRadius: 999,
+              fontSize: 11.5,
+              fontWeight: activeRole === 'warga' ? 800 : 500,
+              background: activeRole === 'warga' ? '#10b981' : 'transparent',
+              color: activeRole === 'warga' ? '#ffffff' : 'var(--text-secondary)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            <span>👥</span>
+            <span>Masyarakat / Warga</span>
+          </button>
+        </div>
+
+        {/* Desktop nav links */}
         <div className="nav-desktop" style={{ alignItems: 'center', gap: 2 }}>
           {navItems.map(i => <a key={i.label} href={i.href} className="nav-link">{i.label}</a>)}
         </div>
 
-        {/* Right side: CTA + theme toggle + hamburger */}
+        {/* Right side: quick jump + theme toggle + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <a href="#dashboard" className="btn-primary nav-desktop" style={{ padding: '8px 18px', fontSize: 13 }}>
-            Lihat Demo
+          <a
+            href={activeRole === 'pemerintah' ? '#dashboard' : '#portal-warga'}
+            className="btn-primary nav-desktop"
+            style={{ padding: '8px 16px', fontSize: 12.5 }}
+          >
+            {activeRole === 'pemerintah' ? 'Pusat Kendali' : 'Buka Portal Warga'}
           </a>
 
           {/* Theme toggle */}
