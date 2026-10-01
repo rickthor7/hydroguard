@@ -21,6 +21,34 @@ export default function PortalMasyarakat() {
     'pra-2': true,
   });
 
+  // Live broadcast received from Government / BPBD
+  const [receivedAlert, setReceivedAlert] = useState(() => {
+    try {
+      const saved = localStorage.getItem('hg_live_warga_alert');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      id: 'BC-9102',
+      waktu: 'Baru Saja',
+      wilayah: 'DAS Ciliwung — Wilayah Berisiko Tinggi',
+      pesan: '🚨 PERINGATAN DINI BANJIR (SIAGA 1): Ketinggian Bendung Katulampa mencapai 240 cm. Debit banjir kiriman diperkirakan tiba di Jakarta 4-6 jam lagi. Warga bantaran sungai segera amankan dokumen penting dan bersiap evakuasi ke Posko GOR Otista / Kantor Kelurahan!',
+      channels: { wa: true, sms: true, appPush: true, siren: true },
+      targetGroup: 'warga',
+    };
+  });
+  const [showAlertBanner, setShowAlertBanner] = useState(true);
+
+  useEffect(() => {
+    const handleBroadcastEvent = (e) => {
+      if (e.detail) {
+        setReceivedAlert(e.detail);
+        setShowAlertBanner(true);
+      }
+    };
+    window.addEventListener('hg_new_broadcast', handleBroadcastEvent);
+    return () => window.removeEventListener('hg_new_broadcast', handleBroadcastEvent);
+  }, []);
+
   // Simulation state
   const [simStep, setSimStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -99,6 +127,79 @@ export default function PortalMasyarakat() {
             Pantau prakiraan cuaca BMKG, prediksi banjir di kelurahan Anda, simulasi rute evakuasi bebas genangan, dan panduan mitigasi darurat.
           </p>
         </div>
+
+        {/* Live Broadcast Notifikasi dari Dashboard Pemerintah / BPBD */}
+        <AnimatePresence>
+          {showAlertBanner && receivedAlert && (
+            <motion.div
+              initial={{ opacity: 0, y: -14, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(239,68,68,0.16), rgba(245,158,11,0.12))',
+                border: '1px solid rgba(239,68,68,0.4)',
+                borderRadius: 14,
+                padding: '16px 20px',
+                marginBottom: 20,
+                boxShadow: '0 0 24px rgba(239,68,68,0.2)',
+                position: 'relative',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(239,68,68,0.25)', border: '1px solid rgba(239,68,68,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ShieldAlert size={22} color="#ef4444" className="blink" />
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        Peringatan Resmi BPBD / Pemerintah
+                      </span>
+                      <span style={{ fontSize: 10.5, background: 'rgba(239,68,68,0.2)', color: '#ef4444', padding: '1px 8px', borderRadius: 999, fontWeight: 700 }}>
+                        {receivedAlert.id}
+                      </span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>• {receivedAlert.waktu}</span>
+                    </div>
+
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-heading)', lineHeight: 1.5, marginBottom: 8 }}>
+                      {receivedAlert.pesan}
+                    </div>
+
+                    {/* Kanal Transmisi yang Digunakan */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Terkirim serentak melalui:</span>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        📱 Dashboard Warga
+                      </span>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        💬 WhatsApp Broadcast
+                      </span>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.3)', color: '#0ea5e9', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        ✉️ SMS Cell Broadcast
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAlertBanner(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: 16,
+                    padding: 4,
+                  }}
+                  title="Tutup Notifikasi"
+                >
+                  ✕
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Emergency SOS Hotlines Quick Bar */}
         <div

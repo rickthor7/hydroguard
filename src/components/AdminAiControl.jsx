@@ -46,18 +46,33 @@ export default function AdminAiControl() {
       setIsSending(false);
       setBroadcastSuccess(true);
 
+      const alertPayload = {
+        id: `BC-${Math.floor(1000 + Math.random() * 9000)}`,
+        waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+        wilayah: 'DAS Ciliwung — Wilayah Siaga Kritis',
+        pesan: editableMessage,
+        channels: { ...selectedChannels },
+        targetGroup,
+      };
+
+      // Broadcast to localStorage & CustomEvent for citizen dashboard instant sync
+      try {
+        localStorage.setItem('hg_live_warga_alert', JSON.stringify(alertPayload));
+        window.dispatchEvent(new CustomEvent('hg_new_broadcast', { detail: alertPayload }));
+      } catch (e) {}
+
       // Append to broadcast history
       const newLog = {
-        id: `BC-${Math.floor(1000 + Math.random() * 9000)}`,
+        id: alertPayload.id,
         waktu: 'Baru saja',
-        wilayah: 'DAS Ciliwung — Wilayah Berisiko',
-        kanal: Object.keys(selectedChannels).filter(k => selectedChannels[k]).join(', ').toUpperCase(),
+        wilayah: alertPayload.wilayah,
+        kanal: Object.keys(selectedChannels).filter(k => selectedChannels[k]).map(k => k === 'wa' ? 'WhatsApp' : k === 'sms' ? 'SMS Blast' : k === 'appPush' ? 'Dashboard Warga' : 'Sirine').join(', '),
         penerima: targetGroup === 'warga' ? '18.420 Warga' : targetGroup === 'timSar' ? '450 Personel TRC' : '65 Operator SDA',
         status: 'Terkirim 100%',
         aiTrigger: `Matching Pola ${selectedDataset.nama} (${selectedDataset.matchScore}%)`,
       };
       setBroadcastHistory(prev => [newLog, ...prev]);
-    }, 1200);
+    }, 900);
   };
 
   return (
@@ -357,10 +372,10 @@ export default function AdminAiControl() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {[
-                  { key: 'wa', label: 'WhatsApp Gateway API (Warga Terdaftar)', desc: '14.820 nomor aktif' },
-                  { key: 'siren', label: 'Aktivasi Sirine Peringatan Lapangan (Pos Pantau)', desc: 'Radius suara 1.5 km' },
-                  { key: 'appPush', label: 'Push Notification Mobile HYDROGUARD', desc: 'Prioritas kritis' },
-                  { key: 'sms', label: 'SMS Cell Broadcast (Kerjasama Kominfo)', desc: 'Target radius menara BTS' },
+                  { key: 'appPush', label: 'Dashboard Warga & Push Notifikasi', desc: 'Tayang langsung seketika di portal masyarakat', icon: '📱' },
+                  { key: 'wa', label: 'WhatsApp Broadcast Gateway (Warga Terdaftar)', desc: 'Broadcast massal ke nomor WA warga & pengurus RT/RW', icon: '💬' },
+                  { key: 'sms', label: 'SMS Cell Broadcast (Kominfo / Provider)', desc: 'Terkirim langsung via SMS broadcast ke seluruh ponsel di zona merah', icon: '✉️' },
+                  { key: 'siren', label: 'Aktivasi Sirine Peringatan Lapangan (Pos Pantau)', desc: 'Radius alarm suara darurat 1.5 km di tepi sungai', icon: '🚨' },
                 ].map(c => (
                   <label
                     key={c.key}
@@ -382,7 +397,10 @@ export default function AdminAiControl() {
                       style={{ accentColor: '#0ea5e9' }}
                     />
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-heading)' }}>{c.label}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span>{c.icon}</span>
+                        <span>{c.label}</span>
+                      </div>
                       <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{c.desc}</div>
                     </div>
                   </label>

@@ -331,15 +331,12 @@ export default function DashboardDemo() {
 
       <div style={{ position:'relative', maxWidth:1280, margin:'0 auto', padding:'0 20px' }}>
 
-        {/* Header */}
-        <motion.div initial={{ opacity:0, y:20 }} animate={inView?{opacity:1,y:0}:{}} style={{ textAlign:'center', marginBottom:36 }}>
-          <div className="section-label">Dashboard Operasional & Komando</div>
-          <h2 style={{ fontSize:'clamp(24px, 4vw, 42px)', fontWeight:800, marginBottom:10, letterSpacing:'-0.02em' }}>
-            Pusat Kendali <span className="grad-text">HYDROGUARD</span>
+        {/* Header Fokus Pemantauan */}
+        <motion.div initial={{ opacity:0, y:20 }} animate={inView?{opacity:1,y:0}:{}} style={{ textAlign:'center', marginBottom:20 }}>
+          <div className="section-label">Dashboard Pemantauan & Komando</div>
+          <h2 style={{ fontSize:'clamp(24px, 4vw, 38px)', fontWeight:800, margin:0, letterSpacing:'-0.02em' }}>
+            Pusat Kendali & Pemantauan Banjir
           </h2>
-          <p style={{ fontSize:15, color:'var(--text-secondary)', maxWidth:560, margin:'0 auto', lineHeight:1.7 }}>
-            Platform pemantauan telemetri real-time, pencocokan pola banjir berbasis AI, dan sistem broadcast peringatan dini terpersonalisasi untuk otoritas BPBD/Pemerintah.
-          </p>
         </motion.div>
 
         {/* Panel wrapper */}
@@ -388,7 +385,7 @@ export default function DashboardDemo() {
                   }}
                 >
                   <Activity size={14} />
-                  Telemetri Sensor & Peta Ciliwung
+                  Pemantauan Sensor & Peta Ciliwung
                 </button>
 
                 <button
@@ -409,10 +406,10 @@ export default function DashboardDemo() {
                     transition: 'all 0.18s',
                   }}
                 >
-                  <BrainCircuit size={14} />
-                  Analisis AI & Dispatcher Peringatan Dini
+                  <Radio size={14} />
+                  Kirim Notifikasi (WA, SMS & Dashboard Warga)
                   <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.22)', padding: '1px 6px', borderRadius: 999, fontWeight: 800 }}>
-                    MATCH 94.8%
+                    SIAP BROADCAST
                   </span>
                 </button>
               </div>

@@ -1,16 +1,16 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const RoleContext = createContext({
-  activeRole: 'pemerintah', // 'pemerintah' | 'warga'
+  activeRole: 'warga', // 'warga' | 'pemerintah'
   setActiveRole: () => {},
 });
 
 export function RoleProvider({ children }) {
   const [activeRole, setActiveRole] = useState(() => {
     try {
-      return localStorage.getItem('hg-role') || 'pemerintah';
+      return localStorage.getItem('hg-role') || 'warga';
     } catch {
-      return 'pemerintah';
+      return 'warga';
     }
   });
 

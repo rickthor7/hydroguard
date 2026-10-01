@@ -25,10 +25,6 @@ function AppContent() {
         {/* Separated Dashboards based on Active Role (Tanpa Login) */}
         {activeRole === 'pemerintah' ? (
           <>
-            <ProblemStatement />
-            <div className="divider" style={{ margin: '0 32px' }} />
-            <CaraKerja />
-            <div className="divider" style={{ margin: '0 32px' }} />
             <DashboardDemo />
           </>
         ) : (

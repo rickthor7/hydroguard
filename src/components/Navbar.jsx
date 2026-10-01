@@ -13,8 +13,8 @@ export default function Navbar() {
   const navItems = activeRole === 'pemerintah'
     ? [
         { label: 'Beranda', href: '#beranda' },
-        { label: 'Pusat Kendali BPBD', href: '#dashboard' },
-        { label: 'Cara Kerja', href: '#cara-kerja' },
+        { label: 'Pusat Pemantauan BPBD', href: '#dashboard' },
+        { label: 'Fitur', href: '#fitur' },
         { label: 'Dampak', href: '#dampak' },
       ]
     : [
